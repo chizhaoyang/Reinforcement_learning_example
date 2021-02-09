@@ -1,2 +1,4 @@
 # Reinforcement_learning_example
-These are examples from Xian Guo's book.
+
+## Chapter 1
+Gambling Machine with Multiple Arms
