@@ -154,17 +154,17 @@ class YuanYangEnv:
         if self.viewer is None:
             pygame.init()
 
-        self.viewer = pygame.display.set_mode(self.screen_size, 0, 32)
-        pygame.display.set_caption("yuanyang")
+            self.viewer = pygame.display.set_mode(self.screen_size, 0, 32)
+            pygame.display.set_caption("yuanyang")
 
-        self.bird_male = load_bird_male()
-        self.bird_female = load_bird_female()
-        self.background = load_background()
-        self.obstacle = load_obstacle()
-        self.viewer.blit(self.bird_male, self.bird_male_init_position)
-        self.viewer.blit(self.bird_female, self.bird_female_init_position)
-        self.viewer.blit(self.background, (0, 0))
-        self.font = pygame.font.SysFont('times', 15)
+            self.bird_male = load_bird_male()
+            self.bird_female = load_bird_female()
+            self.background = load_background()
+            self.obstacle = load_obstacle()
+            self.viewer.blit(self.bird_male, self.bird_male_init_position)
+            self.viewer.blit(self.bird_female, self.bird_female_init_position)
+            self.viewer.blit(self.background, (0, 0))
+            self.font = pygame.font.SysFont('times', 15)
         self.viewer.blit(self.background, (0, 0))
         # draw lines
         for i in range(11):
@@ -175,7 +175,7 @@ class YuanYangEnv:
         # draw obstacles
         for i in range(8):
             self.viewer.blit(self.obstacle, (self.obstacle1_x[i], self.obstacle1_y[i]))
-            self.viewer.blit(self.obstacle, (self.obstacle2_x[i], self.obstacle1_y[i]))
+            self.viewer.blit(self.obstacle, (self.obstacle2_x[i], self.obstacle2_y[i]))
         
         self.viewer.blit(self.bird_male, self.bird_male_position)
 
@@ -183,17 +183,17 @@ class YuanYangEnv:
             for j in range(10):
                 surface = self.font.render(str(round(float(self.value[i, j]), 3)), True, (0, 0, 0))
                 self.viewer.blit(surface, (120 * i + 5, 90 * j + 70))
-            
-        pygame.display.update()
-        self.gameover()
-        self.FPSCLOCK.tick(30)
-
+        
         # draw way points
         for i in range(len(self.path)):
             rec_position = self.state_to_position(self.path[i])
             pygame.draw.rect(self.viewer, [255, 0, 0], [rec_position[0], rec_position[1], 120, 90], 3)
             surface = self.font.render(str(i), True, (255, 0, 0))
             self.viewer.blit(surface, (rec_position[0] + 5, rec_position[1] + 5))
+
+        pygame.display.update()
+        self.gameover()
+        self.FPSCLOCK.tick(30)
 
 if __name__=="__main__":
     yy = YuanYangEnv()

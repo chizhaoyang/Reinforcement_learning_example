@@ -2,8 +2,7 @@ import pygame
 import os
 import os.path as osp
 
-# path_file = osp.abspath(__file__)
-path_file = os.getcwd()
+path_file = os.path.dirname(__file__)
 path_images = osp.join(path_file, 'images')
 
 def load_bird_male():
