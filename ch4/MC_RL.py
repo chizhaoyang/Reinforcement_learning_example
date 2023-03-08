@@ -92,10 +92,59 @@ class MC_RL:
             flag = 1
         return flag
     
+    def mc_learning_on_policy(self, num_iter, epsilon):
+        self.qvalue = np.zeros((len(yuanyang.states), len(yuanyang.actions)))
+        self.n = 0.001 * np.ones((len(yuanyang.states), len(yuanyang.actions)))
+        # learn num_iter times
+        for iter1 in range(num_iter):
+            s_sample = []
+            a_sample = []
+            r_sample = []
+            s = 0
+            done = False
+            step_num = 0
+            epsilon = epsilon * np.exp(-iter1 / 1000)
+
+            # s0-a1-s1-a2-s2 ... terminate state
+            while False == done and step_num < 30:
+                a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+                s_next, r, done = self.yuanyang.transform(s, a)
+                a_num = self.find_anum(a)
+                # punish if go back
+                if s_next in s_sample:
+                    r = -2
+                
+                # save data
+                s_sample.append(s)
+                r_sample.append(r)
+                a_sample.append(a_num)
+                step_num += 1
+                # move to next state
+                s = s_next
+            
+            if s == 9:
+                print("The number need for finishing the task:", iter1)
+                break
+
+            a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+            g = self.qvalue[s, self.find_anum(a)]
+
+            for i in range(len(s_sample) - 1, -1, -1):
+                g *= self.gamma
+                g += r_sample[i]
+            
+            for i in range(len(s_sample)):
+                    self.n[s_sample[i], a_sample[i]] += 1.0
+                    self.qvalue[s_sample[i], a_sample[i]] = (self.qvalue[s_sample[i], a_sample[i]] * (self.n[s_sample[i], a_sample[i]] - 1) + g) / self.n[s_sample[i], a_sample[i]]
+                    g -= r_sample[i]
+                    g /= self.gamma
+        return self.qvalue
+    
 if __name__ == "__main__":
     yuanyang = YuanYangEnv()
     brain = MC_RL(yuanyang)
-    qvalue1 = brain.mc_learning_ei(num_iter = 10000)
+    # qvalue1 = brain.mc_learning_ei(num_iter = 10000)
+    qvalue1 = brain.mc_learning_on_policy(num_iter = 10000, epsilon = 0.2)
 
     print(qvalue1)
     yuanyang.action_value = qvalue1
