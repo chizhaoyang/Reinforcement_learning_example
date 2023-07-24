@@ -89,4 +89,77 @@ class TD_RL:
                 s = s_next
                 a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
                 count += 1
-            return self.qvalue
+        return self.qvalue
+    def qlearning(self, num_iter, alpha, epsilon):
+        iter_num = []
+        self.qvalue = np.zeros((len(self.yuanyang.states), len(self.yuanyang.actions)))
+        for iter in range(num_iter):
+            s = 0
+            flag = self.greedy_test()
+            if flag == 1:
+                iter_num.append(iter)
+                if len(iter_num) < 2:
+                    print("qlearning the number need to finish first task:", iter_num[0])
+            if flag == 2:
+                print("qlearning the number need to finish first shortest task:", iter)
+                break
+            s_sample = []
+            a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+            t = False
+            count = 0
+            while False == t and count < 30:
+                s_next, r, t = self.yuanyang.transform(s, a)
+                a_num = self.find_anum(a)
+                if s_next in s_sample:
+                    r = -2
+                s_sample.append(s)
+                if t == True:
+                    q_target = r
+                else:
+                    a1 = self.greedy_policy(self.qvalue, s_next)
+                    a1_num = self.find_anum(a1)
+                    q_target = r + self.gamma * self.qvalue[s_next, a1_num]
+                self.qvalue[s, a_num] = self.qvalue[s, a_num] + alpha * (q_target - self.qvalue[s, a_num])
+                s = s_next
+                a = self.epsilon_greedy_policy(self.qvalue, s, epsilon)
+                count += 1
+        return self.qvalue
+
+if __name__ == "__main__":
+    yuanyang = YuanYangEnv()
+    brain = TD_RL(yuanyang)
+    qvalue1 = brain.sarsa(num_iter = 5000, alpha = 0.1, epsilon = 0.8)
+    # qvalue2 = brain.qlearning(num_iter = 5000, alpha = 0.1, epsilon = 0.1)
+
+    # print(qvalue1)
+    yuanyang.action_value = qvalue1
+
+    # print(qvalue2)
+    # yuanyang.action_value = qvalue2
+
+    flag = 1
+    s = 0
+    step_num = 0
+    path = []
+
+    while flag:
+        path.append(s)
+        yuanyang.path = path
+        a = brain.greedy_policy(qvalue1, s)
+        print('%d->%s\t' % (s, a), qvalue1[s, 0], qvalue1[s, 1], qvalue1[s, 2], qvalue1[s, 3])
+        # a = brain.greedy_policy(qvalue2, s)
+        # print('%d->%s\t' % (s, a), qvalue2[s, 0], qvalue2[s, 1], qvalue2[s, 2], qvalue2[s, 3])
+        yuanyang.bird_male_position = yuanyang.state_to_position(s)
+        yuanyang.render()
+        time.sleep(0.25)
+        step_num += 1
+        s_, r, t = yuanyang.transform(s, a)
+        if t == True or step_num > 30:
+            flag = 0
+        s = s_
+    
+    yuanyang.bird_male_position = yuanyang.state_to_position(s)
+    path.append(s)
+    yuanyang.render()
+    while True:
+        yuanyang.render()           

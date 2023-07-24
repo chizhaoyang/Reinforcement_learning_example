@@ -122,9 +122,9 @@ class YuanYangEnv:
 
         flag_find = self.find(current_position)
         if flag_collide == 1:
-            return state, -10, True
+            return state, -20, True
         if flag_find == 1:
-            return state, 10, True
+            return state, 20, True
         
         if action == 'e':
             next_position[0] = current_position[0] + 120
@@ -142,11 +142,11 @@ class YuanYangEnv:
         flag_collide = self.collide(next_position)
 
         if flag_collide == 1:
-            return self.position_to_state(current_position), -10, True
+            return self.position_to_state(current_position), -20, True
         
         flag_find = self.find(next_position)
         if flag_find == 1:
-            return self.position_to_state(next_position), 10, True
+            return self.position_to_state(next_position), 20, True
         
         return self.position_to_state(next_position), -2, False
 
